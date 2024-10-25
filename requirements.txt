@@ -1,0 +1,7 @@
+fastapi[all]
+fastapi
+uvicorn
+pydantic
+psycopg2
+sqlalchemy==1.4
+alembic
