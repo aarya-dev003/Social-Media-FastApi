@@ -20,7 +20,7 @@ class UserResponse(BaseModel):
     created_at : datetime
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
         from_attributes = True
         
 
@@ -31,7 +31,7 @@ class PostResponse(PostBase):
     user: UserResponse
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
         from_attributes = True
         
     
@@ -41,7 +41,7 @@ class PostOut(BaseModel):
     votes : int
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
         from_attributes = True
 
 
@@ -71,5 +71,35 @@ class TokenData(BaseModel):
 
 class Vote(BaseModel):
     post_id : int
-    dir: Annotated[int, conint(le=1)]
-    # dir: Literal[0, 1] 
+    # dir: Annotated[int, conint(le=1)]
+    dir: Literal[0, 1] 
+
+class AnnouncementCreate(BaseModel):
+    description : str
+    class Config:
+        from_attributes =True
+
+class Announcement(AnnouncementCreate):
+    id : int
+    created_at : datetime
+    user_id : int
+    # user : UserResponse
+
+    class Config:
+        from_attributes = True
+
+
+class Feedback(BaseModel):
+    issue : str
+    issue_to : str
+    class Config : 
+        from_attributes = True
+
+class FeedBackOut(Feedback):
+    id : int
+    user_id : int
+    user : UserResponse
+    created_at : datetime
+
+    class Config : 
+        from_attributes = True

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from .import models
 from .database import engine
-from .routers import post, users, auth, vote
+from .routers import post, users, auth, vote, announcement, feedback
 from .middleware import add_cors_middleware
 
 
@@ -23,4 +23,5 @@ app.include_router(post.router)
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(vote.router)
-
+app.include_router(announcement.router)
+app.include_router(feedback.router)

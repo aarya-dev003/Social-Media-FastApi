@@ -26,5 +26,25 @@ class Votes(Base):
     __tablename__ = "votes"
     post_id = Column(Integer, ForeignKey("post.id", ondelete="CASCADE"), nullable= False, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+
+class Announcement(Base):
+    __tablename__ = 'announcement'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    description = Column(String, nullable=False)
+    user_id = Column(Integer, nullable=False)
+
+
+class FeedBack(Base):
+    __tablename__ = 'feedback'
+
+    id = Column(Integer, primary_key= True, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    issue = Column(String, nullable=False)
+    issue_to = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user = relationship("User")
+
  
     

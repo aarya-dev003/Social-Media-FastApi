@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Response
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import schemas, models, utils, oauth2
-
+from datetime import timedelta
+from ..config import settings
 
 router = APIRouter(
     tags = ["Authentication"]
 )
 
+REFRESH_TOKEN_EXPIRY  = settings.refresh_token_expiration
 
 @router.post('/login', response_model=schemas.Token)
 # def login(user_credentials : schemas.UserLogin, db: Session = Depends(get_db)):
@@ -28,8 +31,26 @@ def login(user_credentials : OAuth2PasswordRequestForm= Depends(), db: Session =
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
 
     #create a jwt token 
-    access_token = oauth2.create_access_token(data = {"user_id" : user.id})
-    # return a token
+    access_token = oauth2.create_access_token(
+        data = {"user_id" : user.id, "user_email" : user.email}
+    )
 
-    return {"access_token" : access_token, "token_type" : "bearer"}
+    # refresh token 
+    refresh_token = oauth2.create_access_token(
+        data={"user_id" : user.id, "user_email" : user.email},
+        refresh = True,
+        expiry= timedelta(days=REFRESH_TOKEN_EXPIRY)
+    )
+    # return a token
+    return JSONResponse(
+        content = {
+            "message" : "Login Successfull",
+            "access_token" : access_token,
+            "refresh_token" : refresh_token,
+            "token_type" : "bearer"
+        }
+    )
+    
+
+    # return {"access_token" : access_token, "token_type" : "bearer"}
     

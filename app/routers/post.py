@@ -112,7 +112,7 @@ def update_post(id : int, post: schemas.PostCreate, db : Session = Depends(get_d
     post_query = db.query(models.Posts).filter(models.Posts.id == id)
     update_post = post_query.first()
 
-    print(current_user.email)
+    # print(current_user.email)
     if update_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id= {id} not found")
     
