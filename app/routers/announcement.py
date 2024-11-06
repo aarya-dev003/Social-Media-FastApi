@@ -24,12 +24,13 @@ def get_announcement(db : Session= Depends(get_db)):
 def create_announcement(announcement: schemas.AnnouncementCreate, db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
 
     role = current_user.role
+    print(role)
     if role != 'admin':
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
     
 
     usr_id = current_user.id
-    new_ann = models.Announcement(user_id = usr_id,**announcement.model_dump())
+    new_ann = models.Announcement(admin_id = usr_id,**announcement.model_dump())
     try:
         db.add(new_ann)
         db.commit()
@@ -57,7 +58,7 @@ def update_announcement(id : int, announcement: schemas.AnnouncementCreate, db :
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Announcement with id : {id} not Found')
 
     
-    if to_update.user_id != usr_id:
+    if to_update.admin_id != usr_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorized Action")
 
     ann_query.update(announcement.model_dump(),synchronize_session=False)
@@ -85,7 +86,7 @@ def delete_announcement(id : int,  db : Session = Depends(get_db), current_user 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Announcement with id : {id} not Found')
 
     
-    if to_update.user_id != usr_id:
+    if to_update.admin_id != usr_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorized Action")
 
     # ann_query.update(announcement.model_dump(),synchronize_session=False)

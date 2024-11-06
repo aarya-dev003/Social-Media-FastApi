@@ -25,8 +25,16 @@ def login(user_credentials : OAuth2PasswordRequestForm= Depends(), db: Session =
     user = db.query(models.User).filter(models.User.email == user_credentials.username).first()
     
     if not user:
+        user = db.query(models.Club).filter(models.Club.email == user_credentials.username).first()
+    
+    if not user:
+        user = db.query(models.Admin).filter(models.Admin.email == user_credentials.username).first()
+
+    
+    if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
     
+    # print(user.role)
     if not utils.verify(user_credentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials")
 

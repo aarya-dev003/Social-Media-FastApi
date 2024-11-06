@@ -38,7 +38,7 @@ def get_posts(db : Session = Depends(get_db), limit :int = 10, skip:int = 0, sea
 @router.get('/user', response_model=List[schemas.PostResponse])
 def get_posts(db : Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     
-    posts = db.query(models.Posts).filter(models.Posts.user_id == current_user.id).all()
+    posts = db.query(models.Posts).filter(models.Posts.club_id == current_user.id).all()
     return posts
 
 
@@ -53,7 +53,7 @@ def create_posts(post : schemas.PostCreate, db : Session = Depends(get_db), curr
     if role != 'club':
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
     
-    new_post = models.Posts(user_id = usr_id, **post.model_dump())
+    new_post = models.Posts(club_id = usr_id, **post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -106,7 +106,7 @@ def delete_post(id : int, db:Session = Depends(get_db), current_user: int = Depe
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exits")
     
 
-    if post.user_id != current_user.id:
+    if post.club_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorized to perform Requested Action")
 
     post_query.delete(synchronize_session = False)
@@ -128,7 +128,7 @@ def update_post(id : int, post: schemas.PostCreate, db : Session = Depends(get_d
     if update_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id= {id} not found")
     
-    if update_post.user_id != current_user.id:
+    if update_post.club_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not Authorized Action")
 
     post_query.update(post.model_dump(), synchronize_session = False)

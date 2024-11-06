@@ -9,6 +9,7 @@ from typing import Optional, Annotated, Literal
 class PostBase(BaseModel):
     title : str
     content : str
+    image : str
     published : bool = True
 
 class PostCreate(PostBase):
@@ -22,13 +23,29 @@ class UserResponse(BaseModel):
     class Config:
         # orm_mode = True
         from_attributes = True
+
+class ClubResponse(BaseModel):
+    email: EmailStr
+    id : int
+
+    class Config:
+        # orm_mode = True
+        from_attributes = True
+
+class AdminResponse(BaseModel):
+    email: EmailStr
+    id : int
+
+    class Config:
+        # orm_mode = True
+        from_attributes = True
         
 
 class PostResponse(PostBase):
     id: int
     created_at : datetime
-    user_id : int
-    user: UserResponse
+    image : str
+    club: ClubResponse
 
     class Config:
         # orm_mode = True
@@ -49,8 +66,13 @@ class PostOut(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     password : str
-    role : str = 'user'
 
+
+class ClubCreate(BaseModel):
+    email: EmailStr
+    username : str
+    password : str
+    # role : str = 'club'
 
 
 
@@ -68,6 +90,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id : Optional[str] = None
+    role : Optional[str] = None
 
 
 class Vote(BaseModel):
@@ -83,8 +106,8 @@ class AnnouncementCreate(BaseModel):
 class Announcement(AnnouncementCreate):
     id : int
     created_at : datetime
-    user_id : int
-    # user : UserResponse
+    # admin_id : int
+    admin : AdminResponse
 
     class Config:
         from_attributes = True
@@ -98,7 +121,6 @@ class Feedback(BaseModel):
 
 class FeedBackOut(Feedback):
     id : int
-    user_id : int
     user : UserResponse
     created_at : datetime
 
