@@ -22,6 +22,12 @@ def get_announcement(db : Session= Depends(get_db)):
 
 @router.post('', response_model = schemas.Announcement, status_code=status.HTTP_201_CREATED)
 def create_announcement(announcement: schemas.AnnouncementCreate, db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+
+    role = current_user.role
+    if role != 'admin':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
+
     usr_id = current_user.id
     new_ann = models.Announcement(user_id = usr_id,**announcement.model_dump())
     try:
@@ -36,6 +42,12 @@ def create_announcement(announcement: schemas.AnnouncementCreate, db: Session = 
 
 @router.put('/{id}', response_model=schemas.Announcement)
 def update_announcement(id : int, announcement: schemas.AnnouncementCreate, db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+    
+    
+    role = current_user.role
+    if role != 'admin':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     usr_id = current_user.id
     ann_query = db.query(models.Announcement).filter(models.Announcement.id == id)
 
@@ -58,7 +70,12 @@ def update_announcement(id : int, announcement: schemas.AnnouncementCreate, db :
 
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def update_announcement(id : int,  db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+def delete_announcement(id : int,  db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+    
+    role = current_user.role
+    if role != 'admin':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     usr_id = current_user.id
     ann_query = db.query(models.Announcement).filter(models.Announcement.id == id)
 

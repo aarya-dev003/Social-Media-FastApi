@@ -17,6 +17,11 @@ router = APIRouter(
 
 @router.post('', status_code= status.HTTP_201_CREATED, response_model= schemas.FeedBackOut)
 def create_feedback(feedback : schemas.Feedback, db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+    
+    role = current_user.role
+    if role != 'user':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     usr_id = current_user.id
     new_feedback = models.FeedBack(user_id = usr_id, **feedback.model_dump()) 
     db.add(new_feedback)
@@ -29,6 +34,12 @@ def create_feedback(feedback : schemas.Feedback, db : Session = Depends(get_db),
 
 @router.get('', response_model= List[schemas.FeedBackOut])
 def get_feedback_admin(db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+    
+    role = current_user.role
+    if role != 'admin':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
+
     usr_id = current_user.id
 
     feedback = db.query(models.FeedBack).filter(models.FeedBack.issue_to == 'admin').all()
@@ -45,6 +56,12 @@ def get_feedback_admin(db : Session = Depends(get_db), current_user = Depends(oa
 
 @router.get('/club', response_model= List[schemas.FeedBackOut])
 def get_feedback_club(db : Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+
+    
+    role = current_user.role
+    if role != 'club':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     usr_id = current_user.id
 
     feedback = db.query(models.FeedBack).filter(models.FeedBack.issue_to == 'club').all()

@@ -32,12 +32,12 @@ def login(user_credentials : OAuth2PasswordRequestForm= Depends(), db: Session =
 
     #create a jwt token 
     access_token = oauth2.create_access_token(
-        data = {"user_id" : user.id, "user_email" : user.email}
+        data = {"user_id" : user.id, "user_email" : user.email, "role" : user.role}
     )
 
     # refresh token 
     refresh_token = oauth2.create_access_token(
-        data={"user_id" : user.id, "user_email" : user.email},
+        data={"user_id" : user.id, "user_email" : user.email, "role" : user.role},
         refresh = True,
         expiry= timedelta(days=REFRESH_TOKEN_EXPIRY)
     )

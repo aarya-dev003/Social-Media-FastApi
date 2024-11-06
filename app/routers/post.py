@@ -48,6 +48,11 @@ def create_posts(post : schemas.PostCreate, db : Session = Depends(get_db), curr
     # new_post = models.Posts(title=post.title, content=post.content, published=post.published)
     # to make it cleaner we use pydantic model
     usr_id = current_user.id
+    role = current_user.role
+
+    if role != 'club':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     new_post = models.Posts(user_id = usr_id, **post.model_dump())
     db.add(new_post)
     db.commit()
@@ -89,6 +94,10 @@ def get_post(id:int, db : Session = Depends(get_db)):
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id : int, db:Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    role = current_user.role
+    if role != 'club':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     post_query = db.query(models.Posts).filter(models.Posts.id==id)
     
     post = post_query.first()
@@ -108,7 +117,10 @@ def delete_post(id : int, db:Session = Depends(get_db), current_user: int = Depe
 
 @router.put("/{id}", response_model=schemas.PostResponse)
 def update_post(id : int, post: schemas.PostCreate, db : Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-
+    role = current_user.role
+    if role != 'club':
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authorized For this Action")
+    
     post_query = db.query(models.Posts).filter(models.Posts.id == id)
     update_post = post_query.first()
 

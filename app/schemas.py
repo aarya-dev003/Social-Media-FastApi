@@ -49,6 +49,7 @@ class PostOut(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     password : str
+    role : str = 'user'
 
 
 
